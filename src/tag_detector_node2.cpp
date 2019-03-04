@@ -1,5 +1,5 @@
 /**
-* @brief: ROS Node for reading images
+* @brief: ROS Node for reading Images and Detecting April Tags.
 * @details: ROS node to read frames from a ROS topic /image_raw.
 * @author: Darshan Shah
 * @date: March 4th 2019.
@@ -10,6 +10,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
+#include <vector>
 
 using namespace std;
 using namespace cv;
@@ -19,17 +20,26 @@ static double angle(Point pt1, Point pt2, Point pt0);
 static void drawSquares(Mat& image, const vector<vector<Point> >& squares);
 
 void imageCallback(const sensor_msgs::ImageConstPtr& msg) {
+	int64 t0, t1;
+	vector<double> timeRecord;
+  	double sec;
 	try {
-		Mat tagDetected;
 		Mat rec_img = cv_bridge::toCvShare(msg, "bgr8")->image;
-    	// imshow("view", rec_img);
+    	// imshow("Orignal Image", rec_img);
     	// waitKey(5);
+    	t0 = getTickCount();
     	detectRect(rec_img);
+    	t1 = getTickCount();
     	imshow("Tag Detected", rec_img);
     	waitKey(3);
+    	sec = (t1-t0)/getTickFrequency();
+    	timeRecord.push_back(sec);
+    	ROS_INFO("Computation time for Detection Tags: %lf", sec);
 	} catch (cv_bridge::Exception& e) {
 		ROS_ERROR("Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
   	}
+  	// double averageTime = accumulate( timeRecord.begin(), timeRecord.end(), 0.00)/timeRecord.size();
+  	// ROS_INFO("Average COmputation time was %lf per image", averageTime); 
 
 }
 
