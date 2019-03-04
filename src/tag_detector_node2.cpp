@@ -39,27 +39,26 @@ int qualityThreshold = 2500;
  */
 void imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	int64 t0, t1;
-    double Sharpness;
-  	double sec;
+	double Sharpness;
+	double sec;
 	try {
-		Mat rec_img = cv_bridge::toCvShare(msg, "bgr8")->image;  // Convert images from ROS to OpenCV readable format.
-
-    	// imshow("Orignal Image", rec_img);
-    	// waitKey(500);
-    	t0 = getTickCount(); // Start timer to compute time of execution.
-        Sharpness = evaluateImg(rec_img); // Evaluate Image Quality.
-        if (Sharpness > qualityThreshold) {
-            ROS_INFO("Quality Measure = %lf | Image is Excessively BLURRED. Applying Deblur Filter.", Sharpness);
-            deblur(rec_img); // Deblur the image if it's too blur
-        } else {
-            ROS_INFO("Quality Measure = %lf | Image is Sharp enough!", Sharpness);
-        }
-    	detectRect(rec_img);
-    	t1 = getTickCount(); // Stop timer
-    	imshow("Tag Detected", rec_img);
-    	waitKey(3);
-    	sec = (t1-t0)/getTickFrequency(); // Calculate the computation time
-    	ROS_INFO("Computation time for Detection Tags: %lf", sec);
+	Mat rec_img = cv_bridge::toCvShare(msg, "bgr8")->image;  // Convert images from ROS to OpenCV readable format.
+    // imshow("Orignal Image", rec_img);
+    // waitKey(500);
+    t0 = getTickCount();  // Start timer to compute time of execution.
+    Sharpness = evaluateImg(rec_img);  // Evaluate Image Quality.
+    if (Sharpness > qualityThreshold) {
+    	ROS_INFO("Quality Measure = %lf | Image is Excessively BLURRED. Applying Deblur Filter.", Sharpness);
+        deblur(rec_img); // Deblur the image if it's too blur
+    } else {
+        ROS_INFO("Quality Measure = %lf | Image is Sharp enough!", Sharpness);
+    }
+	detectRect(rec_img);
+	t1 = getTickCount(); // Stop timer
+	imshow("Tag Detected", rec_img);
+	waitKey(3);
+	sec = (t1-t0)/getTickFrequency(); // Calculate the computation time
+	ROS_INFO("Computation time for Detection Tags: %lf", sec);
 	} catch (cv_bridge::Exception& e) {
 		ROS_ERROR("Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
   	}

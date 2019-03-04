@@ -5,7 +5,8 @@ ___________________________________________
 
 ### Functions
 
-A dataset of 2 videos with a Mosaic of AprilTags in provided. This ROS package consists of 2 nodes:
+A dataset of 2 videos with a Mosaic of AprilTags in provided. This ROS package consists of 2 nodes:  
+
 **Node 1**  
  - Reads from the video file and publishes to the ROS Topic _/image_raw_.  
  - Provides the functionality of adjusting the blur size and hence the intensit of Blur that could be applied to the image via a ROS service server named _/set_blur_window_size_.  
