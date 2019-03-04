@@ -11,12 +11,24 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
+#include "tag_detector/set_blur_window_size.h"
 
 
 using namespace std;
 using namespace cv;
 
+int GaussWindowWidth = 9;
+int GaussWindowHeight = 9;
 
+bool getWindowSize(tag_detector::set_blur_window_size::Request &req, 
+         tag_detector::set_blur_window_size::Response &res)
+{
+  GaussWindowWidth = req.i;
+  GaussWindowHeight = req.j;
+  res.status = true;
+  ROS_INFO("Gaussian Window Size Set to [%d,%d] successfully!", GaussWindowWidth, GaussWindowHeight);
+  return true;
+}
 
 int main(int argc, char** argv) {
 	ros::init(argc, argv, "video_reader");
@@ -25,18 +37,21 @@ int main(int argc, char** argv) {
 	ros::NodeHandle nh;
     image_transport::ImageTransport it(nh);
     image_transport::Publisher pub = it.advertise("/image_raw", 1);
+    ros::ServiceServer service = nh.advertiseService("set_blur_window_size", getWindowSize);
+
 
     VideoCapture cap(path + "/data/1.mp4");
     ROS_INFO("Total Frames: %lf", cap.get(CV_CAP_PROP_FRAME_COUNT));
     ros::Rate loop_rate(5);
 
-    cv::Mat frame;
+    cv::Mat frame, blurFrame;
   	sensor_msgs::ImagePtr msg;
 
   	while(nh.ok()) {  //Run the loop while ROS node is running.
   		cap>>frame;
+      GaussianBlur(frame, blurFrame, Size(GaussWindowWidth, GaussWindowHeight), 0, 0 );
   		if(!frame.empty()){
-  			msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
+  			msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", blurFrame).toImageMsg();
   			pub.publish(msg);
   			// imshow("Video Frame", frame);  //Uncomment to see the images being read.
   			waitKey(8);
