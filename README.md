@@ -2,10 +2,19 @@
 ROS Package in C++ to detect AprilTags
 ___________________________________________
 
+### Prerequisite Packages  
+
+1. ROS  
+2. OpenCV  
+
+
+
+
+
 
 ### Functions
 
-A dataset of 2 videos with a Mosaic of AprilTags in provided. This ROS package consists of 2 nodes:  
+A dataset of 2 videos with a Mosaic of AprilTags is provided. This ROS package consists of 2 nodes:  
 
 **Node 1**  
  - Reads from the video file and publishes to the ROS Topic _/image_raw_.  
@@ -40,7 +49,7 @@ $ cd ~/catkin_ws
 $ catkin_make
 ```
 
-This should build the ROS package on your system. The Data foleady has 2 videder alro files. The ROS package must be able to run out of the box.  
+This should build the ROS package on your system. The Data folder already has 2 video files. The ROS package must be able to run out of the box.  
 Source the setup.bash files.
 ```sh
 $ source ~/catkin_ws/devel/setup.bash
