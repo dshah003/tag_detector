@@ -1,10 +1,11 @@
 /**
-* @brief: ROS Node for reading a Video
-* @details: ROS node to read frames from a video and publish image frames to a topic /image_raw.
-* @author: Darshan Shah
-* @date: March 4th 2019.
-*
-*/
+ * @brief      : ROS Node for reading a Video
+ * @details    : ROS node to read frames from a video and publish image frames
+ *             to a topic /image_raw.
+ * @author     : Darshan Shah
+ * @date       : March 4th 2019.
+ */
+
 
 #include <ros/ros.h>
 #include <ros/package.h>
@@ -13,13 +14,22 @@
 #include <image_transport/image_transport.h>
 #include "tag_detector/set_blur_window_size.h"
 
-
 using namespace std;
 using namespace cv;
 
 int GaussWindowWidth = 9;
 int GaussWindowHeight = 9;
 
+/**
+ * @brief      ROS service server function. Adjusts the Gaussian Window size
+ *             requested on the set_blur_window_size service.
+ *
+ * @param      req   The request data: height and width of the blur window.
+ * @param      res   Bool status flag as response,
+ *
+ * @return     A bool flag is returned as acknowldgement of successful execution
+ *             of the function
+ */
 bool getWindowSize(tag_detector::set_blur_window_size::Request &req, 
          tag_detector::set_blur_window_size::Response &res)
 {
@@ -31,11 +41,11 @@ bool getWindowSize(tag_detector::set_blur_window_size::Request &req,
 }
 
 int main(int argc, char** argv) {
-	ros::init(argc, argv, "video_reader");
-  string path = ros::package::getPath("tag_detector");
+	ros::init(argc, argv, "video_reader");  // Initialize ROS node
+  string path = ros::package::getPath("tag_detector"); //Returns path of the package
 	string filePath = "/data/1.mp4";
 
-  if(argc == 2){
+  if(argc == 2){  //Parsing argument which sets a flag for the video file to be read.
     string fileNumber = argv[1];
     if (fileNumber == "1"){
       cout << "Normal Lighting video Selected. To Select Night lighting video, set argv = 2"<<endl;
@@ -46,19 +56,17 @@ int main(int argc, char** argv) {
     }
   }
 	ros::NodeHandle nh;
-    image_transport::ImageTransport it(nh);
-    image_transport::Publisher pub = it.advertise("/image_raw", 1);
-    ros::ServiceServer service = nh.advertiseService("set_blur_window_size", getWindowSize);
+  image_transport::ImageTransport it(nh); 
+  image_transport::Publisher pub = it.advertise("/image_raw", 1);  //Setting up a publisher on topic /image_raw
+  ros::ServiceServer service = nh.advertiseService("set_blur_window_size", getWindowSize); //Setting up a ROS service.
 
+  VideoCapture cap(path + filePath);  // Path to video file.
+  ROS_INFO("Total Frames: %lf", cap.get(CV_CAP_PROP_FRAME_COUNT));
+  ros::Rate loop_rate(5);
+  cv::Mat frame, blurFrame;
+  sensor_msgs::ImagePtr msg;
 
-    VideoCapture cap(path + filePath);
-    ROS_INFO("Total Frames: %lf", cap.get(CV_CAP_PROP_FRAME_COUNT));
-    ros::Rate loop_rate(5);
-
-    cv::Mat frame, blurFrame;
-  	sensor_msgs::ImagePtr msg;
-
-  	while(nh.ok()) {  //Run the loop while ROS node is running.
+  while(nh.ok()) {  //Run the loop while ROS node is running.
   		cap>>frame;
       GaussianBlur(frame, blurFrame, Size(GaussWindowWidth, GaussWindowHeight), 0, 0 );
   		if(!frame.empty()){

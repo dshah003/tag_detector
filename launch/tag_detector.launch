@@ -1,10 +1,5 @@
 <launch>
 	<arg name ="video"/>
 	<node pkg = "tag_detector" type="tag_detector_node1" name="tag_detector_node1" output = "screen" args = "$(arg video)"/>
-		 <!-- param name="video" value="$(arg port)"/ -->
-
 	<node pkg = "tag_detector" type="tag_detector_node2" name="tag_detector_node2" output = "screen"/>
-
-<!-- 	</node> -->
-
 </launch>
