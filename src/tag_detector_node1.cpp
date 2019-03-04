@@ -7,9 +7,11 @@
 */
 
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
+
 
 using namespace std;
 using namespace cv;
@@ -18,12 +20,13 @@ using namespace cv;
 
 int main(int argc, char** argv) {
 	ros::init(argc, argv, "video_reader");
+  string path = ros::package::getPath("tag_detector");
 	
 	ros::NodeHandle nh;
     image_transport::ImageTransport it(nh);
     image_transport::Publisher pub = it.advertise("/image_raw", 1);
 
-    VideoCapture cap("/home/darshan/catkin_ws/src/tag_detector/data/1.mp4");
+    VideoCapture cap(path + "/data/1.mp4");
     ROS_INFO("Total Frames: %lf", cap.get(CV_CAP_PROP_FRAME_COUNT));
     ros::Rate loop_rate(5);
 
