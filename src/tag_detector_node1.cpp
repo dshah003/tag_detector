@@ -33,14 +33,25 @@ bool getWindowSize(tag_detector::set_blur_window_size::Request &req,
 int main(int argc, char** argv) {
 	ros::init(argc, argv, "video_reader");
   string path = ros::package::getPath("tag_detector");
-	
+	string filePath = "/data/1.mp4";
+
+  if(argc == 2){
+    string fileNumber = argv[1];
+    if (fileNumber == "1"){
+      cout << "Normal Lighting video Selected. To Select Night lighting video, set argv = 2"<<endl;
+      filePath = "/data/1.mp4";
+    } else if (fileNumber == "2"){
+      cout << "Night light video Selected. To select Normal lighting video, set argv = 1"<<endl;
+      filePath = "/data/2.mp4";
+    }
+  }
 	ros::NodeHandle nh;
     image_transport::ImageTransport it(nh);
     image_transport::Publisher pub = it.advertise("/image_raw", 1);
     ros::ServiceServer service = nh.advertiseService("set_blur_window_size", getWindowSize);
 
 
-    VideoCapture cap(path + "/data/1.mp4");
+    VideoCapture cap(path + filePath);
     ROS_INFO("Total Frames: %lf", cap.get(CV_CAP_PROP_FRAME_COUNT));
     ros::Rate loop_rate(5);
 
