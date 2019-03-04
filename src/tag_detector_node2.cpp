@@ -24,6 +24,7 @@ static double angle(Point pt1, Point pt2, Point pt0);
 static void drawSquares(Mat& image, const vector<vector<Point> >& squares);
 double evaluateImg(Mat image);
 double calcMean(Mat& img);
+void deblur(Mat& blurredImg);
 
 int qualityThreshold = 2500;
 
@@ -40,7 +41,8 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg) {
     	t0 = getTickCount();
         Sharpness = evaluateImg(rec_img); //Evaluate Image Quality.
         if (Sharpness > qualityThreshold) {
-            ROS_INFO("Quality Measure = %lf | Image is Excessively BLURRED", Sharpness);
+            ROS_INFO("Quality Measure = %lf | Image is Excessively BLURRED. Applying Deblur Filter.", Sharpness);
+            deblur(rec_img);
         } else {
             ROS_INFO("Quality Measure = %lf | Image is Sharp enough!", Sharpness);
         }
@@ -163,3 +165,9 @@ double calcMean(Mat& img){
     // std::cout << "Mean: " << mean[0] << "   StdDev: " << stddev[0] << std::endl;
 }
 
+void deblur(Mat& img){
+    int c = 4;
+    int p = 8*c+1;
+    Mat kernel = (Mat_<int>(3,3)<< -c,-c,-c,-c,p,-c,-c,-c,-c);
+    filter2D(img, img, -1 , kernel, Point(-1,-1), 0, BORDER_DEFAULT );
+}
